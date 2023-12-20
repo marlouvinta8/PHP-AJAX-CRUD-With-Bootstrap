@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,101 +9,98 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
     <title>Marlou Vinta</title>
-  </head>
-  <body>
-  <div class="container">
+    <style>
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
     <div class="row">
-        <div class="col-md-12">
+        <div class="col">
             <div class="card">
                 <div class="card-header">
-                    <h4>Junior Web Developer Exam
+                    <h4 class="mb-0">Junior Web Developer Exam</h4>
                     <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                    Add Product
+                        Add Product
                     </button>
-                    </h4>
                 </div>
                 <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="myTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Product Name</th>
+                                    <th>Unit</th>
+                                    <th>Price</th>
+                                    <th>Expiry Date</th>
+                                    <th>Available Inventory</th>
+                                    <th>Inventory Cost</th>
+                                    <th>Image</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                        <?php
+                        require 'database.php';
 
-                  <table id="myTable" class = "table table-bordered table-striped">
-                        <thead>
-                          <tr>
-                            <th>ID</th>
-                            <th>Product Name</th>
-                            <th>Unit</th>
-                            <th>Price</th>
-                            <th>Expiry Date</th>
-                            <th>Available Inventory</th>
-                            <th>Inventory Cost</th>
-                            <th>Image</th>
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <?php
-                            require 'database.php';
+                        $query = "SELECT * FROM product";
+                        $query_run = mysqli_query($con, $query);
 
-                            $query = "SELECT * FROM product";
-                            $query_run =mysqli_query($con, $query);
+                        if (mysqli_num_rows($query_run) > 0) {
+                            foreach ($query_run as $product) {
+                                ?>
+                                <tr>
+                                    <td><?= $product['id'] ?></td>
+                                    <td><?= $product['productname'] ?></td>
+                                    <td><?= $product['unit'] ?></td>
+                                    <td><?= $product['price'] ?></td>
+                                    <td><?= $product['expiry'] ?></td>
+                                    <td><?= $product['availinv'] ?></td>
+                                    <td><?= $product['invcost'] ?></td>
+                                    <td><img src="uploads/<?= $product['image'] ?>" alt="Product Image" width="50"></td>
 
-                            if(mysqli_num_rows($query_run) > 0)
-                            {
-                              foreach($query_run as $product)
-                              {
-                              ?>
-                              <tr>
-                                <td><?= $product['id']?></td>
-                                <td><?= $product['productname']?></td>
-                                <td><?= $product['unit']?></td>
-                                <td><?= $product['price']?></td>
-                                <td><?= $product['expiry']?></td>
-                                <td><?= $product['availinv']?></td>
-                                <td><?= $product['invcost']?></td>
-                                <td><img src="uploads/<?= $product['image']?>" alt="Product Image" width="50"></td>
-
-                                <td>
-                                  <button type="button" value="<?=$product['id']?>" class="editProductBtn btn btn-success">EDIT</button>
-                                  <a href="" class="btn btn-danger">DELETE</a>
-
-                                </td>
-                              </tr>
-                              <?php
+                                    <td>
+                                        <button type="button" value="<?= $product['id'] ?>" class="editProductBtn btn btn-success">EDIT</button>
+                                        <button type="button" value="<?= $product['id'] ?>" class="deleteProductBtn btn btn-danger">DELETE</button>
+                                    </td>
+                                </tr>
+                                <?php
                             }
-                          }
-                          ?>
-                          <tr>
+                        }
+                        ?>
+                        <tr>
                             <td></td>
-                          </tr>
+                        </tr>
                         </tbody>
-                  </table>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-  </div>
+</div>
 
 
-  
-  <!-- Edit Product -->
-
-  <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Edit Product</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form id="updateProduct" enctype="multipart/form-data">
-      <div class="modal-body">
-
-        <div id="errorMessageUpdate" class="alert alert-warning d-none"></div>
-
-        <input type="hidden" name="product_id" id="product_id">
-
-        <div class="mb-3">
-            <label for="">Product Name</label>
-            <input type="text" name="productname" id="productname" class="form-control">
-        </div>
-        <div class="mb-3">
+<!-- Edit Product -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="updateProduct" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div id="errorMessageUpdate" class="alert alert-warning d-none"></div>
+                    <input type="hidden" name="product_id" id="product_id">
+                    <div class="mb-3">
+                        <label for="">Product Name</label>
+                        <input type="text" name="productname" id="productname" class="form-control">
+                    </div>
+                     <div class="mb-3">
             <label for="">Unit</label>
             <input type="text" name="unit" id="unit" class="form-control">
         </div>
@@ -124,32 +121,32 @@
             
             <input type="file" name="image" id="image" class="form-control">
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Update Product</button>
-      </div>
-    </form>
-    </div>
-  </div>
-  
-  <!-- Add Product -->
-  <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add Product</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form id="saveProduct" enctype="multipart/form-data">
-      <div class="modal-body">
-
-        <div id="errorMessage"class="alert alert-warning d-none"></div>
-        <div class="mb-3">
-            <label for="">Product Name</label>
-            <input type="text" name="productname" class="form-control">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update Product</button>
+                </div>
+            </form>
         </div>
-        <div class="mb-3">
+    </div>
+</div>
+
+<!-- Add Product -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="saveProduct" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div id="errorMessage" class="alert alert-warning d-none"></div>
+                    <div class="mb-3">
+                        <label for="">Product Name</label>
+                        <input type="text" name="productname" class="form-control">
+                    </div>
+                   <div class="mb-3">
             <label for="">Unit</label>
             <input type="text" name="unit" class="form-control">
         </div>
@@ -169,23 +166,22 @@
             <label for="">Image</label>
             <input type="file" name="image" class="form-control">
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Save Product</button>
-      </div>
-    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Product</button>
+                </div>
+            </form>
+        </div>
     </div>
-  </div>
+</div>
 
-  
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script>
-        $(document).on("submit", "#saveProduct", function (e) {
+<script>
+    $(document).on("submit", "#saveProduct", function (e) {
             e.preventDefault();
 
             var formData = new FormData(this);
@@ -206,7 +202,7 @@
                     }else if(res.status == 200){
                         
                         $('#errorMessage').addClass('d-none');
-                        $('#addproductModal').modal('hide');
+                        $('#addProductModal').modal('hide');
                         $('#saveProduct')[0].reset();
 
                       
@@ -246,6 +242,35 @@
     });
   });
 
+  $(document).on('click', '.deleteProductBtn', function(e){
+      e.preventDefault();
+
+      if(confirm("Are you sure you want to delete this product?")){
+        var product_id = $(this).val();
+
+        console.log('Product ID to be deleted:', product_id);
+        $.ajax({
+          type: "POST",
+          url: "product.php",
+          data: {
+            'delete_product': true,
+            'product_id': product_id
+          },
+          success: function (response) {
+            
+            var res = jQuery.parseJSON(response);
+            if(res.status == 500) {
+              alert (res.message);
+            }else{
+              alert (res.message);
+
+              $('#myTable').load(location.href + " #myTable");
+            }
+          }
+        });
+      }
+  });
+
   $(document).on("submit", "#updateProduct", function (e) {
     e.preventDefault();
 
@@ -272,7 +297,7 @@
                 }
             });
         });
-    </script>
+</script>
 
-  </body>
+</body>
 </html>

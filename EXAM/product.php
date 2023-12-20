@@ -2,6 +2,51 @@
 require 'database.php';
 
 
+if(isset($_POST['delete_product'])) {
+    $product_id = mysqli_real_escape_string($con, $_POST['product_id']);
+    
+    $get_image_query = "SELECT image FROM product WHERE id='$product_id'";
+    $get_image_result = mysqli_query($con, $get_image_query);
+
+    if ($get_image_result && mysqli_num_rows($get_image_result) > 0) {
+        $row = mysqli_fetch_assoc($get_image_result);
+        $image_path = $row['image'];
+
+        // Path kung saan nakatago ang larawan sa server
+        $upload_directory = 'uploads/';
+
+        // Buuin ang kompleto at totoong path ng larawan
+        $full_image_path = $upload_directory . $image_path;
+
+        // Siguraduhing mayroon talagang larawan na dapat burahin
+        if (file_exists($full_image_path)) {
+            // Burahin ang larawan sa server
+            unlink($full_image_path);
+        }
+    }
+
+    // Pagkatapos ng pagtanggal ng larawan sa uploads folder, magproceed sa pag-delete ng entry sa database
+    $query = "DELETE FROM product WHERE id='$product_id'";
+    $query_run = mysqli_query($con, $query);
+
+    if($query_run) {
+        $res = [
+            'status' => 200,
+            'message' => "Product and Deleted Successfully!"
+        ];
+        echo json_encode($res);
+        return false;
+    } else {
+        $res = [
+            'status' => 500,
+            'message' => "Something Went Wrong"
+        ];
+        echo json_encode($res);
+        return false;
+    }
+}
+
+
 if(isset($_POST['update_product'])) {
     $product_id = mysqli_real_escape_string($con, $_POST['product_id']);
     $productname = mysqli_real_escape_string($con, $_POST['productname']);
