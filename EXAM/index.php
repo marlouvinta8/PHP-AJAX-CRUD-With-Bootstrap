@@ -270,8 +270,6 @@
       type: "GET",
       url: "product.php?product_id=" + product_id,
       success: function(response){
-        alert("Success! Response: " + response);
-    console.log(response);
         var res = jQuery.parseJSON(response);
 
         if(res.status == 422) {
