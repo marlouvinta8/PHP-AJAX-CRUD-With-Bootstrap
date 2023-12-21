@@ -14,13 +14,10 @@ if(isset($_POST['delete_product'])) {
 
         // Path kung saan nakatago ang larawan sa server
         $upload_directory = 'uploads/';
-
-        // Buuin ang kompleto at totoong path ng larawan
         $full_image_path = $upload_directory . $image_path;
-
         // Siguraduhing mayroon talagang larawan na dapat burahin
         if (file_exists($full_image_path)) {
-            // Burahin ang larawan sa server
+            // Para mabura laman sa server
             unlink($full_image_path);
         }
     }
@@ -32,7 +29,7 @@ if(isset($_POST['delete_product'])) {
     if($query_run) {
         $res = [
             'status' => 200,
-            'message' => "Product and Deleted Successfully!"
+            'message' => "Product Deleted Successfully!"
         ];
         echo json_encode($res);
         return false;
@@ -54,6 +51,20 @@ if(isset($_POST['update_product'])) {
     $price = mysqli_real_escape_string($con, $_POST['price']);
     $expiry = mysqli_real_escape_string($con, $_POST['expiry']);
     $availinc = mysqli_real_escape_string($con, $_POST['availinv']);
+    
+    $check_query = "SELECT * FROM product WHERE productname='$productname' AND id != '$product_id'";
+    $check_result = mysqli_query($con, $check_query);
+
+    if(mysqli_num_rows($check_result) > 0) {
+        // If the product name already exists for a different product, return an error response
+        $res = [
+            'status' => 409,
+            'message' => "Product name already exists for another product!"
+        ];
+        echo json_encode($res);
+        return false;
+    }
+
 
     // Check if image file is selected
     if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
@@ -90,8 +101,9 @@ if(isset($_POST['update_product'])) {
         echo json_encode($res);
         return false;
     }
+    $invcost = $price * $availinc;
 
-    $query = "UPDATE product SET productname='$productname', unit='$unit', price='$price', expiry='$expiry', availinv='$availinc', image='$image' WHERE id='$product_id'";
+    $query = "UPDATE product SET productname='$productname', unit='$unit', price='$price', expiry='$expiry', availinv='$availinc', invcost='$invcost', image='$image' WHERE id='$product_id'";
     $query_run = mysqli_query($con, $query);
 
     if($query_run) {
@@ -152,6 +164,18 @@ if(isset($_POST['save_product']))
     //$invcost = mysqli_real_escape_string($con, $_POST['invcost']);
     //$image = mysqli_real_escape_string($con, $_POST['image']);
 
+    $check_query = "SELECT * FROM product WHERE productname='$productname'";
+    $check_result = mysqli_query($con, $check_query);
+
+    if(mysqli_num_rows($check_result) > 0) {
+        // If the product name already exists, return an error response
+        $res = [
+            'status' => 409,
+            'message' => "Product name already exists!"
+        ];
+        echo json_encode($res);
+        return false;
+    }
     // Check if image file is selected
     if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $image = $_FILES['image']['name']; // Get image name
@@ -171,8 +195,6 @@ if(isset($_POST['save_product']))
         echo json_encode($res);
         return false;
     }
-
-    // Calculate invcost based on price multiplied by availinc
     $invcost = $price * $availinc;
 
     $query = "INSERT INTO product (productname, unit, price, expiry, availinv, invcost, image) VALUES ('$productname', '$unit', '$price', '$expiry', '$availinc', '$invcost', '$image')";
@@ -194,4 +216,5 @@ if(isset($_POST['save_product']))
         return false;
     }
 }
+
 ?>
